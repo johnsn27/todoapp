@@ -1,0 +1,120 @@
+service: todo-app
+
+custom:
+  tableName: TodosTable
+  functionsBasePath: src/handlers
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      seed: true
+    migration:
+      dir: offline/migrations
+    seed:
+      tasks:
+        sources:
+          - table: ${self:custom.tableName}
+            sources: [./offline/seeds/tasks.json]
+  esbuild:
+    sourcemap: true
+    watch:
+      pattern:
+        - "src/**/*.ts"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  environment:
+    TABLE_NAME: ${self:custom.tableName}
+    NODE_OPTIONS: "--enable-source-maps"
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tableName}"
+
+# build:
+#   esbuild: false
+
+resources:
+  Resources:
+    TodosTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableName}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+functions:
+  createTodo:
+    handler: createTodo.handler
+    events:
+      - http:
+          path: todos
+          method: post
+          cors: true
+
+  getTodos:
+    handler: getTodos.handler
+    events:
+      - http:
+          path: todos
+          method: get
+          cors: true
+
+  getTodo:
+    handler: getTodo.handler
+    events:
+      - http:
+          path: todos/{id}
+          method: get
+          cors: true
+
+  updateTodo:
+    handler: updateTodo.handler
+    events:
+      - http:
+          path: todos/{id}
+          method: put
+          cors: true
+
+  deleteTodo:
+    handler: deleteTodo.handler
+    events:
+      - http:
+          path: todos/{id}
+          method: delete
+          cors: true
+
+  searchTodos:
+    handler: searchTodos.handler
+    events:
+      - http:
+          path: todos/search
+          method: get
+          cors: true
+
+plugins:
+  - serverless-functions-base-path
+  - serverless-esbuild
+  - serverless-dynamodb
+  - serverless-offline
+
+package:
+  individually: true

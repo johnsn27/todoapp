@@ -1,0 +1,39 @@
+{
+  "name": "@atg/todo-service",
+  "version": "1.0.0",
+  "description": "ATG coding challenge. Serverless To-Do app.",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "serverless offline start --reloadHandler --httpPort=3001",
+    "test": "jest",
+    "install:dynamodb": "serverless dynamodb install",
+    "postinstall": "pnpm run install:dynamodb"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "3.602.0",
+    "@aws-sdk/lib-dynamodb": "3.602.0",
+    "@aws-sdk/util-dynamodb": "3.602.0",
+    "aws-lambda": "1.0.7",
+    "serverless-dynamodb": "0.2.53",
+    "serverless-esbuild": "1.52.1",
+    "serverless-offline": "13.6.0",
+    "serverless-webpack": "5.14.0",
+    "ts-loader": "9.5.1",
+    "uuid": "9.0.1"
+  },
+  "devDependencies": {
+    "@jest/globals": "29.7.0",
+    "@types/aws-lambda": "8.10.138",
+    "@types/jest": "29.5.12",
+    "@types/node": "20.12.12",
+    "@types/uuid": "9.0.8",
+    "aws-sdk-client-mock": "4.0.1",
+    "jest": "29.7.0",
+    "serverless": "3.39.0",
+    "serverless-functions-base-path": "1.0.33",
+    "ts-jest": "29.1.5",
+    "typescript": "5.4.5"
+  }
+}
